@@ -39,6 +39,9 @@ func (m *Manager) serverWS(w http.ResponseWriter, r *http.Request) {
 
 	client := NewClient(conn, m)
 	m.addClient(client)
+
+	//start client process
+	go client.readMessage()
 }
 
 func (m *Manager) addClient(client *Client) {

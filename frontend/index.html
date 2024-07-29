@@ -36,30 +36,30 @@
 
                 <h3 id="chat-header">Current in chat: test</h3> <br>
                 
-                <form action="" id="chatroom-selection">
+                <form  id="chatroom-selection">
                   <div class="input-group mb-3">
                     <input type="text" name="" class="form-control" placeholder="Chatroom ID" id="chatroom" required>
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+                    <input class="btn btn-outline-success" type="submit" value="search"/>
                   </div>
                 </form>
 
 
                 <div class="form-floating">
-                    <textarea name="" class="form-control" id="" style="height:250px;"></textarea>
+                    <textarea name="" class="form-control" id="" style="height:250px;" readonly></textarea>
                     <label for="">Chat message</label>
                 </div>
 
                 <br>
 
-                <form action="" id="chatroom-messsage">
+                <form id="chatroom-messsage">
                     <div class="input-group mb-3">
                         <input type="text" name="" class="form-control" placeholder="Message" id="msg" required>
-                        <button class="btn btn-outline-success" type="submit">Send</button>
+                        <input class="btn btn-outline-success" type="submit" value="send" />
                       </div>
                 </form>
 
 
-                <script>
+                <script type="text/javascript">
                     var selectedChat = "general";
 
                     function changeChatRoom(){
@@ -76,7 +76,8 @@
                         var newmsg = document.getElementById("msg");
 
                         if(newmsg != null){
-                            console.log(newmsg);
+                            conn.send(newmsg.value);
+                            newmsg.value = "";
                         }
 
                         return false;
@@ -84,8 +85,8 @@
                     }
 
                     window.onload = function(){
-                        document.getElementById("chatroom-selection").onsubmit = changeChatRoom();
-                        document.getElementById("chatroom-messsage").onsubmit = changeChatRoom();
+                        document.getElementById("chatroom-selection").onsubmit = changeChatRoom;
+                        document.getElementById("chatroom-messsage").onsubmit = sendMessage;
 
 
                         if(window["WebSocket"]){
