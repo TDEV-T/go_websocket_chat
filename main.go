@@ -23,9 +23,10 @@ func main() {
 
 func setupAPI(ctx context.Context) {
 
-	manager := NewManager()
+	manager := NewManager(ctx)
 
 	http.Handle("/", http.FileServer(http.Dir("./frontend")))
 
 	http.HandleFunc("/ws", manager.serverWS)
+	http.HandleFunc("/login", manager.loginHandler)
 }

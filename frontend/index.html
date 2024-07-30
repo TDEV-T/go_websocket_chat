@@ -7,45 +7,69 @@
     <title>Chat Application</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-        crossorigin="anonymous"></script>
+
+
 </head>
 
 <body data-bs-theme="dark">
 
 
     <div class="container">
-        <div class="row align-items-center">
+        <div class="row mt-3">
             <div class="col-2"></div>
-            <div class="col-10">
-                <div class="d-flex justify-content-center">
+            <div class="col-8">
+                <div class="container-fluid">
                     <div class="row">
-                        <div class="col">
-                            <h3>Chat Application</h3> 
+                        <div class="col-2"></div>
+
+                        <div class="col-8 text-center">
+                            <h3 id="connection-header">ChatBoard</h3>
+                        </div>
+                        <div class="col-2 text-end">
+
+                            <button class="btn btn-outline-success" type="button" onclick="loginFunc()">login</button>
+
+                            <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ...
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary">Save changes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
 
                 </div>
 
-                <h3 id="chat-header">Current in chat: test</h3> <br>
-                
-                <form  id="chatroom-selection">
-                  <div class="input-group mb-3">
-                    <input type="text" name="" class="form-control" placeholder="Chatroom ID" id="chatroom" required>
-                    <input class="btn btn-outline-success" type="submit" value="search"/>
-                  </div>
+                <h3 id="chat-header">Current in chat: general</h3> <br>
+
+                <form id="chatroom-selection">
+                    <div class="input-group mb-3">
+                        <input type="text" name="" class="form-control" placeholder="Chatroom ID" id="chatroom"
+                            required>
+                        <input class="btn btn-outline-success" id="search_button" disabled="true" type="submit"
+                            value="search" />
+                    </div>
                 </form>
 
 
                 <div class="form-floating">
-                    <textarea name="" class="form-control" id="" style="height:250px;" readonly></textarea>
+                    <textarea name="" class="form-control" id="chat_preview" style="height:250px;" readonly></textarea>
                     <label for="">Chat message</label>
                 </div>
 
@@ -54,29 +78,182 @@
                 <form id="chatroom-messsage">
                     <div class="input-group mb-3">
                         <input type="text" name="" class="form-control" placeholder="Message" id="msg" required>
-                        <input class="btn btn-outline-success" type="submit" value="send" />
-                      </div>
+                        <input class="btn btn-outline-success" id="send_button" disabled="true" type="submit"
+                            value="send" />
+                    </div>
                 </form>
 
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.3/dist/sweetalert2.all.min.js"></script>
 
                 <script type="text/javascript">
                     var selectedChat = "general";
+                    var search_button = document.getElementById("search_button")
+                    var send_button = document.getElementById("send_button")
 
-                    function changeChatRoom(){
+                    class Event {
+                        constructor(type, payload) {
+                            this.type = type;
+                            this.payload = payload;
+                        }
+                    }
+
+                    class SendMessageEvent {
+                        constructor(message, from, sent) {
+                            this.message = message;
+                            this.from = from;
+                            this.sent = sent;
+                        }
+                    }
+
+                    class NewMessageEvent {
+                        constructor(message, from, sent) {
+                            this.message = message;
+                            this.from = from;
+                            this.sent = sent;
+                        }
+                    }
+
+                    class ChangeChatRoomEvent {
+                        constructor(name) {
+                            this.name = name;
+                        }
+                    }
+
+                    function changeChatRoom() {
+                        event.preventDefault()
                         var newchat = document.getElementById("chatroom");
 
-                        if(newchat != null ** newchat.value != selectedChat){
-                            console.log(newchat);
+                        if (newchat != null && newchat.value != selectedChat) {
+                            selectedChat = newchat.value;
+                            header = document.getElementById("chat-header").innerHTML = "Currently in chatroom: " + selectedChat
+
+
+                            let changeEvent = new ChangeChatRoomEvent(selectedChat);
+
+                            sendEvent("change_room", changeEvent)
+
+                            textarea = document.getElementById("chat_preview");
+
+                            textarea.innerHTML = `You changed room into: ${selectedChat}`;
                         }
 
                         return false;
-                    } 
+                    }
 
-                    function sendMessage(){
+                    function loginFunc() {
+                        let username = prompt("Please enter username: ")
+
+                        if (username != null) {
+                            let password = prompt("Please enter password: ");
+
+
+
+                            if (username != null && password != null) {
+                                fetch("login", {
+                                    method: 'post',
+                                    body: JSON.stringify({
+                                        "username": username,
+                                        "password": password
+                                    }),
+                                    mode: 'cors'
+                                }).then((res) => {
+                                    if (res.ok) {
+                                        return res.json();
+                                    } else {
+                                        throw 'unauthorized';
+                                    }
+                                }).then((data) => {
+
+                                    connectWebsocket(data.otp)
+                                })
+                                    .catch((err) => {
+                                        console.log(err);
+                                    })
+                            }
+                        }
+                    }
+
+                    function appendChatMessage(messageEvent) {
+                        var date = new Date(messageEvent.sent);
+                        const formattedMsg = `${date.toLocaleString()}: ${messageEvent.message}`
+
+                        textarea = document.getElementById("chat_preview");
+
+                        textarea.innerHTML = textarea.innerHTML + "\n" + formattedMsg;
+                        textarea.scrollTop = textarea.scrollHeight;
+                    }
+
+                    function connectWebsocket(otp) {
+                        if (window["WebSocket"]) {
+                            url = "ws://" + document.location.host + "/ws?otp=" + otp;
+
+                            console.log(url);
+                            conn = new WebSocket(url);
+
+                            conn.onopen = function (evt) {
+                                document.getElementById("connection-header").innerHTML = "Connected to Websocket: true"
+
+                                search_button.disabled = false;
+                                send_button.disabled = false;
+
+
+                            }
+
+                            conn.onclose = function (evt) {
+                                document.getElementById("connection-header").innerHTML = "Connected to Websocket: false"
+
+                                search_button.disabled = true;
+                                send_button.disabled = true;
+                            }
+
+                            conn.onmessage = function (evt) {
+                                const eventData = JSON.parse(evt.data);
+
+                                const event = Object.assign(new Event, eventData);
+
+                                routeEvent(event);
+                            }
+                        } else {
+                            alert("Browser does not support websockets");
+                        }
+                    }
+
+
+                    function routeEvent(event) {
+                        if (event.type == undefined) {
+                            alert('no type field !');
+                        }
+
+                        switch (event.type) {
+                            case "new_message":
+                                const messageEvent = Object.assign(new NewMessageEvent, event.payload)
+                                appendChatMessage(messageEvent)
+                                break;
+                            case "send_message":
+                                console.log("new msg");
+                                break;
+                            case "change_room":
+                                console.log("change room");
+                                break;
+                            default:
+                                alert("unsupport");
+                                break;
+                        }
+                    }
+
+                    function sendEvent(eventName, payload) {
+                        const event = new Event(eventName, payload);
+
+                        conn.send(JSON.stringify(event))
+                    }
+
+                    function sendMessage() {
+                        event.preventDefault();
                         var newmsg = document.getElementById("msg");
 
-                        if(newmsg != null){
-                            conn.send(newmsg.value);
+                        if (newmsg != null) {
+                            let outgoingEvent = new SendMessageEvent(newmsg.value, "tdev")
+                            sendEvent("send_message", outgoingEvent);
                             newmsg.value = "";
                         }
 
@@ -84,16 +261,12 @@
 
                     }
 
-                    window.onload = function(){
+                    window.onload = function () {
                         document.getElementById("chatroom-selection").onsubmit = changeChatRoom;
                         document.getElementById("chatroom-messsage").onsubmit = sendMessage;
 
 
-                        if(window["WebSocket"]){
-                            conn = new WebSocket("ws://"+ document.location.host + "/ws");
-                        }else{
-                            alert("Browser does not support websockets");
-                        }
+
                     }
                 </script>
 
